@@ -1,3 +1,5 @@
+#allo salamo3alikom hhhhh
+
 from tkinter import *
 from tkinter.messagebox import *
 import sqlite3
@@ -627,4 +629,5 @@ afficher_rdv()
 # Onglet par défaut
 afficher_onglet(frame_patients)
 fen.mainloop()
+
 
