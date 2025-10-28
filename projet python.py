@@ -411,6 +411,34 @@ fen = Tk()
 fen.title("Gestion Hôpital")
 fen.geometry("850x600") 
 
+
+# Palette couleurs : mélange bleu clair <-> bleu foncé
+LIGHT_BLUE = "#dbeeff"   # fond clair
+DARK_BLUE = "#0b3d91"    # bleu foncé pour éléments importants
+ACCENT_BLUE = "#2b6fd6"  # teinte intermédiaire pour onglets
+TEXT_COLOR = "#032a63"   # couleur du texte (bleu très foncé)
+ENTRY_BG = "#ffffff"      # fond des champs de saisie
+
+# Appliquer des options globales pour harmoniser l'interface
+fen.configure(bg=LIGHT_BLUE)
+# Defaults généraux
+fen.option_add("*Background", LIGHT_BLUE)
+fen.option_add("*foreground", TEXT_COLOR)
+fen.option_add("*Frame.background", LIGHT_BLUE)
+fen.option_add("*Label.background", LIGHT_BLUE)
+fen.option_add("*Label.foreground", TEXT_COLOR)
+fen.option_add("*Entry.background", ENTRY_BG)
+fen.option_add("*Entry.foreground", TEXT_COLOR)
+fen.option_add("*Listbox.background", ENTRY_BG)
+fen.option_add("*Listbox.foreground", TEXT_COLOR)
+# Boutons et menus (plus foncés pour contraste)
+fen.option_add("*Button.background", DARK_BLUE)
+fen.option_add("*Button.foreground", "white")
+fen.option_add("*Menubutton.background", ACCENT_BLUE)
+fen.option_add("*Menubutton.foreground", "white")
+fen.option_add("*Menu.background", ENTRY_BG)
+fen.option_add("*Menu.foreground", TEXT_COLOR)
+
 frame_patients = Frame(fen)
 frame_medecins = Frame(fen)
 frame_rdv = Frame(fen)
@@ -567,3 +595,4 @@ afficher("rendezvous")
 
 afficher_onglet(frame_patients)
 fen.mainloop()
+
