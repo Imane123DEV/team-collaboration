@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.messagebox import *
 import sqlite3
 
-
+#wafin a siham
 db = sqlite3.connect("gestion_hopital.db")
 db.row_factory = sqlite3.Row
 
@@ -627,3 +627,4 @@ afficher_rdv()
 # Onglet par défaut
 afficher_onglet(frame_patients)
 fen.mainloop()
+
