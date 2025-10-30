@@ -577,9 +577,9 @@ Label(frame_rdv, text="Date").grid(row=2, column=0, sticky=W, padx=5, pady=2)
 frame_date_r = Frame(frame_rdv)
 frame_date_r.grid(row=2, column=1, sticky=W, padx=5, pady=2)
 
-jour_rdv = StringVar()
-mois_rdv = StringVar()
-annee_rdv = StringVar()
+jour_rdv = StringVar(value="1")
+mois_rdv = StringVar(value="1")
+annee_rdv = StringVar(value="2025")
 
 jours_r = [str(i) for i in range(1, 32)]
 mois_r = [str(i) for i in range(1, 13)]
