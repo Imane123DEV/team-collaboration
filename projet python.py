@@ -244,7 +244,7 @@ def modifier(table):
             showerror("Erreur", "Sélectionnez un rendez-vous")
             return
 
-        idr = list_rdv.get(selection[0]).split("|")[0].strip()
+        idr = list_rdv.get(selection[0]).split("|")[0]
         rdv = db.execute("SELECT * FROM rendezvous WHERE id_rdv=?", (idr,)).fetchone()
         if not rdv:
             showerror("Erreur", "Rendez-vous introuvable")
@@ -360,9 +360,9 @@ def supprimer(table):
 
 def rechercher(table):
     if table == "patients":
-        nom = ent_rech_nom.get().strip()
-        prenom = ent_rech_prenom.get().strip()
-        cin = ent_rech_cin.get().strip()
+        nom = ent_rech_nom.get()
+        prenom = ent_rech_prenom.get()
+        cin = ent_rech_cin.get()
 
         if not nom and not prenom and not cin:
             showerror("Erreur", "Saisir au moins une information")
@@ -382,9 +382,9 @@ def rechercher(table):
             list_result.insert(END,f"{row['id_patient']:<5} | {row['nom']:<20} | {row['prenom']:<20} | {row['CIN']:<10} | {row['date_naissance']:<12} | {row['telephone']:<12}")
 
     elif table == "medecins":
-        nom = ent_rech_nom_m.get().strip()
-        prenom = ent_rech_prenom_m.get().strip()
-        spec = ent_rech_spec.get().strip()
+        nom = ent_rech_nom_m.get()
+        prenom = ent_rech_prenom_m.get()
+        spec = ent_rech_spec.get()
 
         if not nom and not prenom and not spec:
             showerror("Erreur", "Saisir au moins un nom ou une spécialité")
@@ -404,9 +404,9 @@ def rechercher(table):
             list_result.insert(END,f"{row['id_medecin']:<5} | {row['nom']:<20} | {row['prenom']:<20} | {row['specialite']:<25} | {row['telephone']:<15}")
 
     elif table == "rendezvous":
-        pid = ent_rech_pid.get().strip()
-        mid = ent_rech_mid.get().strip()
-        datev = ent_rech_date.get().strip()
+        pid = ent_rech_pid.get()
+        mid = ent_rech_mid.get()
+        datev = ent_rech_date.get()
 
         if not pid and not mid and not datev:
             showerror("Erreur", "Saisir au moins un champ (patient, médecin ou date)")
