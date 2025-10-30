@@ -57,6 +57,9 @@ def ajouter(table):
         if cursor.fetchone():
             showerror("Erreur", "CIN EXISTE DEJA !")
             return
+        if not tel.isdigit() or len(tel)!=10 or not (tel.startswith("05") or tel.startswith("06") or tel.startswith("07")):
+            showerror("Erreur", "Numéro de téléphone pas valide")
+            return
         db.execute("INSERT INTO patients(nom, prenom,CIN,date_naissance, telephone) VALUES(?,?,?,?,?)",(nom, prenom,CIN,date_naiss, tel))
         db.commit()
         afficher("patients")
@@ -68,6 +71,9 @@ def ajouter(table):
         tel = ent_tel_m.get()
         if not nom or not spec or not tel or not prenom:
             showerror("Erreur","Tous les champs sont obligatoires")
+            return
+        if not tel.isdigit() or len(tel)!=10 or not (tel.startswith("05") or tel.startswith("06") or tel.startswith("07")):
+            showerror("Erreur", "Numéro de téléphone pas valide")
             return
         db.execute("INSERT INTO medecins(nom,prenom, specialite, telephone) VALUES(?,?,?,?)",(nom, prenom,spec, tel))
         db.commit()
@@ -152,6 +158,9 @@ def modifier(table):
             if cursor.fetchone():
                 showerror("Erreur", "CIN EXISTE DEJA !")
                 return
+            if not tel.isdigit() or len(tel)!=10 or not (tel.startswith("05") or tel.startswith("06") or tel.startswith("07")):
+                showerror("Erreur", "Numéro de téléphone pas valide")
+                return
             db.execute("UPDATE patients SET nom=?, prenom=?,CIN =? ,date_naissance=?, telephone=? WHERE id_patient=?",(nom, prenom,cin ,date_naiss, tel, idp))
             db.commit()
             afficher("patients")
@@ -204,6 +213,9 @@ def modifier(table):
             tel = ent_tel.get()
             if not nom or not spec or not tel or not prenom:
                 showerror("Erreur", "Tous les champs sont obligatoires")
+                return
+            if not tel.isdigit() or len(tel)!=10 or not (tel.startswith("05") or tel.startswith("06") or tel.startswith("07")):
+                showerror("Erreur", "Numéro de téléphone pas valide")
                 return
             db.execute("UPDATE medecins SET nom=?, prenom=?,specialite=?, telephone=? WHERE id_medecin=?",(nom,prenom, spec, tel, idm))
             db.commit()
@@ -411,8 +423,6 @@ fen = Tk()
 fen.title("Gestion Hôpital")
 fen.geometry("850x600") 
 
-
-# Palette couleurs : mélange bleu clair <-> bleu foncé
 LIGHT_BLUE = "#dbeeff"   # fond clair
 DARK_BLUE = "#0b3d91"    # bleu foncé pour éléments importants
 ACCENT_BLUE = "#2b6fd6"  # teinte intermédiaire pour onglets
@@ -483,7 +493,7 @@ OptionMenu(frame_date, mois_var, *mois).pack(side=LEFT)
 OptionMenu(frame_date, annee_var, *annees).pack(side=LEFT)
 
 Label(frame_patients, text="Téléphone du patient").grid(row=4, column=0, sticky=W, padx=5, pady=2)
-ent_tel_p = Entry(frame_patients,highlightthickness=1,highlightbackground="grey"); ent_tel_p.grid(row=4, column=1, sticky=W, padx=5, pady=2)
+ent_tel_p = Entry(frame_patients); ent_tel_p.grid(row=4, column=1, sticky=W, padx=5, pady=2)
 
 Button(frame_patients, text="Ajouter le patient", command=lambda:ajouter("patients")).grid(row=0, column=2,rowspan=4, pady=5)
 Button(frame_patients, text="Modifier le patient", command=lambda:modifier("patients")).grid(row=12, column=0,padx=30 ,pady=5,sticky=W)
@@ -595,4 +605,3 @@ afficher("rendezvous")
 
 afficher_onglet(frame_patients)
 fen.mainloop()
-
