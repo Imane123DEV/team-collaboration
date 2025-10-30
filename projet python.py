@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.messagebox import *
 import sqlite3
+from datetime import datetime
 
 db = sqlite3.connect("gestion_hopital.db")
 db.row_factory = sqlite3.Row
@@ -60,6 +61,11 @@ def ajouter(table):
         if not tel.isdigit() or len(tel)!=10 or not (tel.startswith("05") or tel.startswith("06") or tel.startswith("07")):
             showerror("Erreur", "Numéro de téléphone pas valide")
             return
+        
+        date_naiss_v = datetime.strptime(date_naiss, "%d-%m-%Y").date()
+        if date_naiss_v > datetime.now().date():
+            showerror("Erreur", "La date de naissance pas valide")
+            return
         db.execute("INSERT INTO patients(nom, prenom,CIN,date_naissance, telephone) VALUES(?,?,?,?,?)",(nom, prenom,CIN,date_naiss, tel))
         db.commit()
         afficher("patients")
@@ -87,6 +93,10 @@ def ajouter(table):
         motif = ent_motif.get()
         if not pid or not mid or not date_r or not heure or not motif:
             showerror("Erreur","Tous les champs sont obligatoires")
+            return
+        date_r_v = datetime.strptime(date_r, "%d-%m-%Y").date()
+        if date_r_v < datetime.now().date():
+            showerror("Erreur", "La date n'est pas valide")
             return
         db.execute("INSERT INTO rendezvous(id_patient,id_medecin,date_rdv,heure_rdv,motif) VALUES(?,?,?,?,?)",(pid, mid, date_r, heure, motif))
         db.commit()
@@ -160,6 +170,10 @@ def modifier(table):
                 return
             if not tel.isdigit() or len(tel)!=10 or not (tel.startswith("05") or tel.startswith("06") or tel.startswith("07")):
                 showerror("Erreur", "Numéro de téléphone pas valide")
+                return
+            date_naiss_v = datetime.strptime(date_naiss, "%d-%m-%Y").date()
+            if date_naiss_v > datetime.now().date():
+                showerror("Erreur", "La date de naissance pas valide")
                 return
             db.execute("UPDATE patients SET nom=?, prenom=?,CIN =? ,date_naissance=?, telephone=? WHERE id_patient=?",(nom, prenom,cin ,date_naiss, tel, idp))
             db.commit()
@@ -295,6 +309,10 @@ def modifier(table):
             motif = ent_motif_rv.get()
             if not pid or not mid or not date_r or not heure or not motif:
                 showerror("Erreur", "Tous les champs sont obligatoires")
+                return
+            date_r_v = datetime.strptime(date_r, "%d-%m-%Y").date()
+            if date_r_v < datetime.now().date():
+                showerror("Erreur", "La date n'est pas valide")
                 return
             db.execute("UPDATE rendezvous SET id_patient=?, id_medecin=?, date_rdv=?, heure_rdv=?, motif=? WHERE id_rdv=?",(pid, mid, date_r, heure, motif, idr))
             db.commit()
