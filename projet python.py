@@ -10,16 +10,11 @@ def calcul():
 temps = timeit.timeit(calcul, number=1000)
 print(f"Temps total d'execution : {temps:.5f} secondes")
 
-
 db = sqlite3.connect("gestion_hopital.db")
 db.row_factory = sqlite3.Row
-
 db.execute("CREATE TABLE IF NOT EXISTS patients(id_patient INTEGER PRIMARY KEY AUTOINCREMENT,CIN TEXT UNIQUE,nom TEXT,prenom TEXT,date_naissance TEXT,telephone TEXT)")
-
 db.execute("CREATE TABLE IF NOT EXISTS medecins(id_medecin INTEGER PRIMARY KEY AUTOINCREMENT,nom TEXT,prenom TEXT,specialite TEXT,telephone TEXT)")
-
 db.execute("CREATE TABLE IF NOT EXISTS rendezvous(id_rdv INTEGER PRIMARY KEY AUTOINCREMENT,id_patient INTEGER,id_medecin INTEGER,date_rdv TEXT,heure_rdv TEXT,motif TEXT,FOREIGN KEY(id_patient) REFERENCES patients(id_patient),FOREIGN KEY(id_medecin) REFERENCES medecins(id_medecin))")
-
 db.commit()
 
 def afficher(table):
@@ -67,7 +62,7 @@ def ajouter(table):
             showerror("Erreur", "CIN EXISTE DEJA !")
             return
         if not tel.isdigit() or len(tel)!=10 or not (tel.startswith("05") or tel.startswith("06") or tel.startswith("07")):
-            showerror("Erreur", "Numéro de téléphone pas valide")
+            showerror("Erreur", "Numéro de téléphone pas valide !")
             return
         
         date_naiss_v = datetime.strptime(date_naiss, "%d-%m-%Y").date()
@@ -83,8 +78,8 @@ def ajouter(table):
         prenom = ent_prenom_m.get()
         spec = ent_spec_m.get()
         tel = ent_tel_m.get()
-        if not nom or not spec or not tel or not prenom:
-            showerror("Erreur","Tous les champs sont obligatoires")
+        if not nom or spec=="Sélectionner une Spécialité" or not tel or not prenom:
+            showerror("Erreur","Tous les champs sont obligatoires !")
             return
         if not tel.isdigit() or len(tel)!=10 or not (tel.startswith("05") or tel.startswith("06") or tel.startswith("07")):
             showerror("Erreur", "Numéro de téléphone pas valide")
@@ -170,14 +165,14 @@ def modifier(table):
             date_naiss = f"{jour_var.get()}-{mois_var.get()}-{annee_var.get()}"
             tel = ent_tel.get()
             if not nom or not prenom or not date_naiss or not tel or not cin:
-                showerror("Erreur", "Tous les champs sont obligatoires")
+                showerror("Erreur", "Tous les champs sont obligatoires !")
                 return
             cursor = db.execute("SELECT * FROM patients WHERE CIN = ? AND id_patient <> ?", (cin,idp))
             if cursor.fetchone():
                 showerror("Erreur", "CIN EXISTE DEJA !")
                 return
             if not tel.isdigit() or len(tel)!=10 or not (tel.startswith("05") or tel.startswith("06") or tel.startswith("07")):
-                showerror("Erreur", "Numéro de téléphone pas valide")
+                showerror("Erreur", "Numéro de téléphone pas valide !")
                 return
             date_naiss_v = datetime.strptime(date_naiss, "%d-%m-%Y").date()
             if date_naiss_v > datetime.now().date():
@@ -193,18 +188,17 @@ def modifier(table):
     elif table=="medecins":
         selection = list_medecins.curselection()
         if not selection:
-            showerror("Erreur", "Sélectionnez un médecin")
+            showerror("Erreur", "Sélectionnez un médecin !")
             return
 
         idm = list_medecins.get(selection[0]).split("|")[0]
-
         medecin = None
         curseur = db.execute("SELECT * FROM medecins WHERE id_medecin=?", (idm,))
         for row in curseur:
             medecin = row
             break  
         popup = Toplevel()
-        popup.geometry("250x200")
+        popup.geometry("300x250")
         popup.title("Modifier Médecin")
 
         Label(popup, text="Nom").grid(row=0, column=0,padx=10,pady=10)
@@ -233,7 +227,7 @@ def modifier(table):
             prenom=ent_prenom.get()
             spec = ent_spec.get()
             tel = ent_tel.get()
-            if not nom or not spec or not tel or not prenom:
+            if not nom or spec=="Sélectionner une Spécialité" or not tel or not prenom:
                 showerror("Erreur", "Tous les champs sont obligatoires")
                 return
             if not tel.isdigit() or len(tel)!=10 or not (tel.startswith("05") or tel.startswith("06") or tel.startswith("07")):
@@ -371,7 +365,6 @@ def rechercher(table):
         nom = ent_rech_nom.get()
         prenom = ent_rech_prenom.get()
         cin = ent_rech_cin.get()
-
         if not nom and not prenom and not cin:
             showerror("Erreur", "Saisir au moins une information")
             return
@@ -393,8 +386,7 @@ def rechercher(table):
         nom = ent_rech_nom_m.get()
         prenom = ent_rech_prenom_m.get()
         spec = ent_rech_spec.get()
-
-        if not nom and not prenom and not spec:
+        if not nom and not prenom and spec=="Sélectionner une Spécialité":
             showerror("Erreur", "Saisir au moins un nom ou une spécialité")
             return
 
@@ -415,7 +407,6 @@ def rechercher(table):
         pid = ent_rech_pid.get()
         mid = ent_rech_mid.get()
         datev = ent_rech_date.get()
-
         if not pid and not mid and not datev:
             showerror("Erreur", "Saisir au moins un champ (patient, médecin ou date)")
             return
@@ -443,19 +434,17 @@ def rechercher(table):
 
             list_result.insert(END,f"{r['id_rdv']:<5} | {patient_nom:<20} | {medecin_nom:<20} | {r['date_rdv']:<12} | {r['heure_rdv']:<8} | {r['motif']:<25}")
 
-
 #INTERFACE :
 fen = Tk()
 fen.title("Gestion Hôpital")
-fen.geometry("850x600") 
+fen.geometry("850x650") 
 
 LIGHT_BLUE = "#dbeeff"   # fond clair
-DARK_BLUE = "#0b3d91"    # bleu foncé pour éléments importants
+DARK_BLUE = "#2451A0"    # bleu foncé pour éléments importants
 ACCENT_BLUE = "#2b6fd6"  # teinte intermédiaire pour onglets
 TEXT_COLOR = "#032a63"   # couleur du texte (bleu très foncé)
 ENTRY_BG = "#ffffff"      # fond des champs de saisie
 
-# Appliquer des options globales pour harmoniser l'interface
 fen.configure(bg=LIGHT_BLUE)
 # Defaults généraux
 fen.option_add("*Background", LIGHT_BLUE)
@@ -486,40 +475,37 @@ def afficher_onglet(frame):
     frame.pack(fill=BOTH, expand=YES, padx=10, pady=10)
 
 frame_onglets = Frame(fen)
-frame_onglets.pack(side=TOP, fill=X, pady=5)
-btn_patients = Button(frame_onglets, text="Patients", command=lambda: afficher_onglet(frame_patients))
-btn_patients.pack(side=LEFT, fill=X, expand=True)
-btn_medecins = Button(frame_onglets, text="Médecins", command=lambda: afficher_onglet(frame_medecins))
-btn_medecins.pack(side=LEFT, fill=X, expand=True)
-btn_rdv = Button(frame_onglets, text="Rendez-vous", command=lambda: afficher_onglet(frame_rdv))
-btn_rdv.pack(side=LEFT, fill=X, expand=True)
+frame_onglets.pack(side=TOP, fill=X, pady=5,padx=5)
+btn_patients = Button(frame_onglets, text="Patients", command=lambda: afficher_onglet(frame_patients),relief=RIDGE,bd=3)
+btn_patients.pack(side=LEFT, fill=X, expand=True,padx=5)
+btn_medecins = Button(frame_onglets, text="Médecins", command=lambda: afficher_onglet(frame_medecins),relief=RIDGE,bd=3)
+btn_medecins.pack(side=LEFT, fill=X, expand=True,padx=5)
+btn_rdv = Button(frame_onglets, text="Rendez-vous", command=lambda: afficher_onglet(frame_rdv),relief=RIDGE,bd=3)
+btn_rdv.pack(side=LEFT, fill=X, expand=True,padx=5)
 
 # Frame Patients :
 Label(frame_patients, text="Nom du patient").grid(row=0, column=0, sticky=W, padx=5, pady=2)
-ent_nom_p = Entry(frame_patients); ent_nom_p.grid(row=0, column=1, sticky=W, padx=5, pady=2)
+ent_nom_p = Entry(frame_patients,width=28); ent_nom_p.grid(row=0, column=1, sticky=W, padx=5, pady=2)
 Label(frame_patients, text="Prénom du patient").grid(row=1, column=0, sticky=W, padx=5, pady=2)
-ent_prenom_p = Entry(frame_patients); ent_prenom_p.grid(row=1, column=1, sticky=W, padx=5, pady=2)
+ent_prenom_p = Entry(frame_patients,width=28); ent_prenom_p.grid(row=1, column=1, sticky=W, padx=5, pady=2)
 Label(frame_patients, text="CIN du patient").grid(row=2, column=0, sticky=W, padx=5, pady=2)
-ent_CIN_p=Entry(frame_patients); ent_CIN_p.grid(row=2, column=1, sticky=W, padx=5, pady=2)
-Label(frame_patients, text="Date Naissance du patient").grid(row=3, column=0, sticky=W, padx=5, pady=2)
+ent_CIN_p=Entry(frame_patients,width=28); ent_CIN_p.grid(row=2, column=1, sticky=W, padx=5, pady=2)
 
+Label(frame_patients, text="Date Naissance du patient").grid(row=3, column=0, sticky=W, padx=5, pady=2)
 frame_date = Frame(frame_patients)
 frame_date.grid(row=3, column=1, sticky=W, padx=5, pady=2)
-
 jour_var = StringVar(value="1")
 mois_var = StringVar(value="1")
 annee_var = StringVar(value="2000")
-
 jours = [str(i) for i in range(1, 32)]
 mois = [str(i) for i in range(1, 13)]
 annees = [str(i) for i in range(2026, 1925,-1)]
-
 OptionMenu(frame_date, jour_var, *jours).pack(side=LEFT)
 OptionMenu(frame_date, mois_var, *mois).pack(side=LEFT)
 OptionMenu(frame_date, annee_var, *annees).pack(side=LEFT)
 
 Label(frame_patients, text="Téléphone du patient").grid(row=4, column=0, sticky=W, padx=5, pady=2)
-ent_tel_p = Entry(frame_patients); ent_tel_p.grid(row=4, column=1, sticky=W, padx=5, pady=2)
+ent_tel_p = Entry(frame_patients,width=28); ent_tel_p.grid(row=4, column=1, sticky=W, padx=5, pady=2)
 
 Button(frame_patients, text="Ajouter le patient", command=lambda:ajouter("patients")).grid(row=0, column=2,rowspan=4, pady=5)
 Button(frame_patients, text="Modifier le patient", command=lambda:modifier("patients")).grid(row=12, column=0,padx=30 ,pady=5,sticky=W)
@@ -527,11 +513,11 @@ Button(frame_patients, text="Supprimer le patient", command=lambda:supprimer("pa
 
 Label(frame_patients, text="---------------------------------- Recherche ----------------------------------").grid(row=6, column=0, columnspan=2, pady=5,sticky=W)
 Label(frame_patients, text="Nom").grid(row=7, column=0, sticky=W, padx=5)
-ent_rech_nom = Entry(frame_patients); ent_rech_nom.grid(row=7, column=1, sticky=W, padx=5)
+ent_rech_nom = Entry(frame_patients,width=28); ent_rech_nom.grid(row=7, column=1, sticky=W, padx=5)
 Label(frame_patients, text="Prénom").grid(row=8, column=0, sticky=W, padx=5)
-ent_rech_prenom = Entry(frame_patients); ent_rech_prenom.grid(row=8, column=1, sticky=W, padx=5)
+ent_rech_prenom = Entry(frame_patients,width=28); ent_rech_prenom.grid(row=8, column=1, sticky=W, padx=5)
 Label(frame_patients, text="CIN").grid(row=9, column=0, sticky=W, padx=5)
-ent_rech_cin = Entry(frame_patients); ent_rech_cin.grid(row=9, column=1, sticky=W, padx=5)
+ent_rech_cin = Entry(frame_patients,width=28); ent_rech_cin.grid(row=9, column=1, sticky=W, padx=5)
 Button(frame_patients, text="Rechercher", command=lambda:rechercher("patients")).grid(row=7, column=2, rowspan=3, pady=10)
 
 list_patients = Listbox(frame_patients, width=95, height=15,font=("Courier New", 10))
@@ -541,18 +527,18 @@ afficher("patients")
 
 # Frame Médecins :
 Label(frame_medecins, text="Nom du medecin").grid(row=0, column=0, sticky=W, padx=5, pady=2)
-ent_nom_m = Entry(frame_medecins); ent_nom_m.grid(row=0, column=1, sticky=W, padx=5, pady=2)
+ent_nom_m = Entry(frame_medecins,width=30); ent_nom_m.grid(row=0, column=1, sticky=W, padx=5, pady=2)
 Label(frame_medecins, text="Prénom du medecin").grid(row=1, column=0, sticky=W, padx=5, pady=2)
-ent_prenom_m = Entry(frame_medecins); ent_prenom_m.grid(row=1, column=1, sticky=W, padx=5, pady=2)
+ent_prenom_m = Entry(frame_medecins,width=30); ent_prenom_m.grid(row=1, column=1, sticky=W, padx=5, pady=2)
 Label(frame_medecins, text="Spécialité du medecin").grid(row=2, column=0, sticky=W, padx=5, pady=2)
 frame_spec = Frame(frame_medecins)
 frame_spec.grid(row=2, column=1, sticky=W, padx=5, pady=2)
-ent_spec_m= StringVar()
-specialite = ["Médecin généraliste", "Dentiste", "Pédiatre", "Gynécologue/Obstétricien", "Cardiologue", "Dermatologue", "Ophtalmologiste", "Orthopédiste", "Psychiatre", "ORL (Oto-rhino-laryngologiste)"]
+ent_spec_m= StringVar(value="Sélectionner une Spécialité")
+specialite = ["Médecin généraliste", "Dentiste", "Pédiatre", "Gynécologue/Obstétricien", "Cardiologue", "Dermatologue", "Ophtalmologiste", "Orthopédiste", "Psychiatre"]
 OptionMenu(frame_spec, ent_spec_m , *specialite).pack(side=LEFT,expand=TRUE)
 
 Label(frame_medecins, text="Téléphone du medecin").grid(row=3, column=0, sticky=W, padx=5, pady=2)
-ent_tel_m = Entry(frame_medecins); ent_tel_m.grid(row=3, column=1, sticky=W, padx=5, pady=2)
+ent_tel_m = Entry(frame_medecins,width=30); ent_tel_m.grid(row=3, column=1, sticky=W, padx=5, pady=2)
 
 Button(frame_medecins, text="Ajouter le medecin", command=lambda:ajouter("medecins")).grid(row=0,column=2,rowspan=3, pady=5)
 Button(frame_medecins, text="Modifier le medecin", command=lambda:modifier("medecins")).grid(row=11,column=0, pady=2,sticky=W,padx=30)
@@ -560,13 +546,13 @@ Button(frame_medecins, text="Supprimer le medecin", command=lambda:supprimer("me
 
 Label(frame_medecins, text="---------------------------------- Recherche ----------------------------------").grid(row=4,column=0,columnspan=2, pady=5,sticky=W)
 Label(frame_medecins, text="Nom du medecin").grid(row=5,column=0, sticky=W, padx=5, pady=5)
-ent_rech_nom_m = Entry(frame_medecins); ent_rech_nom_m.grid(row=5,column=1, sticky=W, padx=5, pady=5)
+ent_rech_nom_m = Entry(frame_medecins,width=30); ent_rech_nom_m.grid(row=5,column=1, sticky=W, padx=5, pady=5)
 Label(frame_medecins, text="Prénom du medecin").grid(row=6,column=0, sticky=W, padx=5, pady=5)
-ent_rech_prenom_m = Entry(frame_medecins); ent_rech_prenom_m.grid(row=6,column=1, sticky=W, padx=5, pady=5)
+ent_rech_prenom_m = Entry(frame_medecins,width=30); ent_rech_prenom_m.grid(row=6,column=1, sticky=W, padx=5, pady=5)
 Label(frame_medecins, text="Spécialité du medecin").grid(row=7,column=0, sticky=W, padx=5, pady=5)
 frame_rech_spec = Frame(frame_medecins)
 frame_rech_spec.grid(row=7, column=1, sticky=W, padx=5, pady=2)
-ent_rech_spec= StringVar()
+ent_rech_spec= StringVar(value="Sélectionner une Spécialité")
 OptionMenu(frame_rech_spec, ent_rech_spec , *specialite).pack(side=LEFT,expand=TRUE)
 Button(frame_medecins, text="Rechercher", command=lambda:rechercher("medecins")).grid(row=6,column=2, pady=10,rowspan=3)
 
@@ -577,22 +563,19 @@ afficher("medecins")
 
 # Frame Rendez-vous :
 Label(frame_rdv, text="ID Patient").grid(row=0, column=0, sticky=W, padx=5, pady=2)
-ent_pid = Entry(frame_rdv); ent_pid.grid(row=0, column=1, sticky=W, padx=5, pady=2)
+ent_pid = Entry(frame_rdv,width=28); ent_pid.grid(row=0, column=1, sticky=W, padx=5, pady=2)
 Label(frame_rdv, text="ID Médecin").grid(row=1, column=0, sticky=W, padx=5, pady=2)
-ent_mid = Entry(frame_rdv); ent_mid.grid(row=1, column=1, sticky=W, padx=5, pady=2)
-Label(frame_rdv, text="Date").grid(row=2, column=0, sticky=W, padx=5, pady=2)
+ent_mid = Entry(frame_rdv,width=28); ent_mid.grid(row=1, column=1, sticky=W, padx=5, pady=2)
 
+Label(frame_rdv, text="Date").grid(row=2, column=0, sticky=W, padx=5, pady=2)
 frame_date_r = Frame(frame_rdv)
 frame_date_r.grid(row=2, column=1, sticky=W, padx=5, pady=2)
-
 jour_rdv = StringVar(value="1")
 mois_rdv = StringVar(value="1")
 annee_rdv = StringVar(value="2025")
-
 jours_r = [str(i) for i in range(1, 32)]
 mois_r = [str(i) for i in range(1, 13)]
 annees_r = [str(i) for i in range(2025, 2030)]
-
 OptionMenu(frame_date_r, jour_rdv, *jours_r).pack(side=LEFT)
 OptionMenu(frame_date_r, mois_rdv, *mois_r).pack(side=LEFT)
 OptionMenu(frame_date_r, annee_rdv, *annees_r).pack(side=LEFT)
@@ -600,17 +583,14 @@ OptionMenu(frame_date_r, annee_rdv, *annees_r).pack(side=LEFT)
 Label(frame_rdv, text="Heure").grid(row=3, column=0, sticky=W, padx=5, pady=2)
 frame_heure = Frame(frame_rdv)
 frame_heure.grid(row=3, column=1, sticky=W, padx=5, pady=2)
-
 spin_heure = Spinbox(frame_heure, from_=8, to=18, width=3, format="%02.0f")
 spin_heure.pack(side=LEFT)
-
 Label(frame_heure, text=":").pack(side=LEFT)
-
 spin_minute = Spinbox(frame_heure, from_=0, to=59, width=3, format="%02.0f")
 spin_minute.pack(side=LEFT)
 
 Label(frame_rdv, text="Motif").grid(row=4, column=0, sticky=W, padx=5, pady=2)
-ent_motif = Entry(frame_rdv); ent_motif.grid(row=4, column=1, sticky=W, padx=5, pady=2)
+ent_motif = Entry(frame_rdv,width=28); ent_motif.grid(row=4, column=1, sticky=W, padx=5, pady=2)
 
 Button(frame_rdv, text="Ajouter le rendez-vous", command=lambda:ajouter("rendezvous")).grid(row=0,column=2,rowspan=5, pady=5)
 Button(frame_rdv, text="Modifier le rendez-vous", command=lambda:modifier("rendezvous")).grid(row=13,column=0, pady=5,padx=30)
@@ -618,11 +598,11 @@ Button(frame_rdv, text="Supprimer le rendez-vous", command=lambda:supprimer("ren
 
 Label(frame_rdv, text="--------------------------------- Recherche ---------------------------------").grid(row=7,column=0,columnspan=2, pady=5,sticky=W)
 Label(frame_rdv, text="ID Patient").grid(row=8,column=0, sticky=W, padx=5)
-ent_rech_pid = Entry(frame_rdv); ent_rech_pid.grid(row=8,column=1, sticky=W, padx=5)
+ent_rech_pid = Entry(frame_rdv,width=28); ent_rech_pid.grid(row=8,column=1, sticky=W, padx=5)
 Label(frame_rdv, text="ID Médecin").grid(row=9,column=0, sticky=W, padx=5)
-ent_rech_mid = Entry(frame_rdv); ent_rech_mid.grid(row=9,column=1, sticky=W, padx=5)
+ent_rech_mid = Entry(frame_rdv,width=28); ent_rech_mid.grid(row=9,column=1, sticky=W, padx=5)
 Label(frame_rdv, text="Date").grid(row=10,column=0, sticky=W, padx=5)
-ent_rech_date = Entry(frame_rdv); ent_rech_date.grid(row=10,column=1, sticky=W, padx=5)
+ent_rech_date = Entry(frame_rdv,width=28); ent_rech_date.grid(row=10,column=1, sticky=W, padx=5)
 Button(frame_rdv, text="Rechercher", command=lambda:rechercher("rendezvous")).grid(row=8,column=2,rowspan=3, pady=10)
 
 list_rdv = Listbox(frame_rdv, width=90, height=13,font=("Courier New", 10))
@@ -631,4 +611,3 @@ afficher("rendezvous")
 
 afficher_onglet(frame_patients)
 fen.mainloop()
-
