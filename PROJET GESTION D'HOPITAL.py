@@ -5,8 +5,11 @@ from datetime import datetime
 
 db = sqlite3.connect("gestion_hopital.db")
 db.row_factory = sqlite3.Row
+
 db.execute("CREATE TABLE IF NOT EXISTS patients(id_patient INTEGER PRIMARY KEY AUTOINCREMENT,CIN TEXT UNIQUE,nom TEXT,prenom TEXT,date_naissance TEXT,telephone TEXT)")
+
 db.execute("CREATE TABLE IF NOT EXISTS medecins(id_medecin INTEGER PRIMARY KEY AUTOINCREMENT,nom TEXT,prenom TEXT,specialite TEXT,telephone TEXT)")
+
 db.execute("CREATE TABLE IF NOT EXISTS rendezvous(id_rdv INTEGER PRIMARY KEY AUTOINCREMENT,id_patient INTEGER,id_medecin INTEGER,date_rdv TEXT,heure_rdv TEXT,motif TEXT,FOREIGN KEY(id_patient) REFERENCES patients(id_patient),FOREIGN KEY(id_medecin) REFERENCES medecins(id_medecin))")
 db.commit()
 
@@ -604,4 +607,3 @@ afficher("rendezvous")
 
 afficher_onglet(frame_patients)
 fen.mainloop()
-
