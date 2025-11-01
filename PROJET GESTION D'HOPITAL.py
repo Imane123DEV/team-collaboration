@@ -386,6 +386,11 @@ def rechercher(table):
             showerror("Erreur", "Saisir au moins un nom ou une spécialité")
             return
 
+        if spec == "Sélectionner une Spécialité":
+            spec_sql = "%"
+        else:
+            spec_sql = f"%{spec}%"
+
         fen_rech = Toplevel(fen)
         fen_rech.title("Résultats Recherche Médecin")
         fen_rech.geometry("800x400")
@@ -396,7 +401,7 @@ def rechercher(table):
         list_result.insert(END, f"{'ID':<5} | {'Nom':<20} | {'Prénom':<20} |{'Spécialité':<25} | {'Téléphone':<15}")
         list_result.insert(END, "-"*96)
 
-        for row in db.execute("SELECT * FROM medecins WHERE nom LIKE ? AND prenom LIKE ? AND specialite LIKE ?",(f"%{nom}%", f"%{prenom}%", f"%{spec}%")):
+        for row in db.execute("SELECT * FROM medecins WHERE nom LIKE ? AND prenom LIKE ? AND specialite LIKE ?",(f"%{nom}%", f"%{prenom}%", spec_sql)):
             list_result.insert(END,f"{row['id_medecin']:<5} | {row['nom']:<20} | {row['prenom']:<20} | {row['specialite']:<25} | {row['telephone']:<15}")
 
     elif table == "rendezvous":
