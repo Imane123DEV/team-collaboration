@@ -2,13 +2,6 @@ from tkinter import *
 from tkinter.messagebox import *
 import sqlite3
 from datetime import datetime
-import timeit
-
-def calcul():
-    return [i*i for i in range(1000)]
-
-temps = timeit.timeit(calcul, number=1000)
-print(f"Temps total d'execution : {temps:.5f} secondes")
 
 db = sqlite3.connect("gestion_hopital.db")
 db.row_factory = sqlite3.Row
@@ -611,3 +604,4 @@ afficher("rendezvous")
 
 afficher_onglet(frame_patients)
 fen.mainloop()
+
